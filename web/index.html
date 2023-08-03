@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+  <title>Go Editor</title>
+  <style>
+    #editor { width: 600px; height: 400px; }
+  </style>
+</head>
+<body>
+  <div id="editor"></div>
+  <button onclick="executeCode()">Execute Code</button>
+  <script src="wasm_exec.js"></script>
+  <script>
+    const editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/golang");
+
+    function getCode() {
+      return editor.getValue();
+    }
+
+    function executeCode() {
+      const code = getCode();
+      runCode(code);
+    }
+
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+      go.run(result.instance);
+    });
+  </script>
+</body>
+</html>
